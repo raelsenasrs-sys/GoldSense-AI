@@ -6,6 +6,10 @@ st.set_page_config(
     page_title="GoldSense AI Live Monitor", page_icon="📈", layout="wide"
 )
 
+from streamlit_autorefresh import st_autorefresh
+
+# Run every 10 seconds (10000 milliseconds)
+count = st_autorefresh(interval=10000, limit=None, key="datarefresh")
 
 @st.cache_resource
 def init_connection():
