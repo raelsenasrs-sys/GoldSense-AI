@@ -1,15 +1,15 @@
 import pandas as pd
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
 from supabase import create_client
 
 st.set_page_config(
     page_title="GoldSense AI Live Monitor", page_icon="📈", layout="wide"
 )
 
-from streamlit_autorefresh import st_autorefresh
-
-# Run every 10 seconds (10000 milliseconds)
+# Run auto-refresh every 10 seconds (10000 milliseconds)
 count = st_autorefresh(interval=10000, limit=None, key="datarefresh")
+
 
 @st.cache_resource
 def init_connection():
@@ -28,7 +28,7 @@ response = (
     supabase.table("trading_metrics")
     .select("*")
     .order("id", desc=True)
-    .limit(20)
+    .limit(50)
     .execute()
 )
 df = pd.DataFrame(response.data)
@@ -47,7 +47,8 @@ if not df.empty:
   st.markdown("**Performance History**")
   st.dataframe(df, use_container_width=True)
 
-  st.markdown("**Equity Curve**")
-  st.line_chart(df.set_index("timestamp")["equity"])
+  # Added chart display section at the bottom
+  st.markdown("**Equity Curve & Price Action**")
+  st.line_chart(df.set_index("timestamp")[["equity"]])
 else:
   st.warning("No telemetry data found. Waiting for local engine transmission...")
